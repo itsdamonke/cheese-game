@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Cheese 🧀</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 400px;
+            height: 600px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+            border: 4px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        #cheese {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            font-size: 40px;
+            line-height: 40px;
+            left: 50px;
+            top: 250px;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+
+        .pipe {
+            position: absolute;
+            width: 60px;
+            background: linear-gradient(90deg, #8B7355 0%, #D2B48C 50%, #8B7355 100%);
+            border: 3px solid #654321;
+            border-radius: 5px;
+        }
+
+        .pipe-top {
+            top: 0;
+        }
+
+        .pipe-bottom {
+            bottom: 0;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            z-index: 10;
+        }
+
+        #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            border-radius: 10px;
+        }
+
+        #gameOverScreen h1 {
+            color: #FFD700;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        #gameOverScreen p {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        #restartBtn {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #FFD700;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        #restartBtn:hover {
+            background: #FFC700;
+        }
+
+        #countdownScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            border-radius: 10px;
+        }
+
+        #countdownNumber {
+            color: #FFD700;
+            font-size: 120px;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        #startText {
+            color: white;
+            font-size: 28px;
+            margin-top: 30px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        #instructionsScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 25;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #instructionsScreen h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+
+        #instructionsScreen p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #instructionsScreen button {
+            margin-top: 30px;
+            padding: 12px 25px;
+            font-size: 18px;
+            background: #FFD700;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #instructionsScreen button:hover {
+            background: #FFC700;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="score">Score: 0</div>
+        <div id="cheese">🧀</div>
+        
+        <div id="instructionsScreen">
+            <h1>🧀 FLAPPY CHEESE 🧀</h1>
+            <p>Click or press SPACE to make the cheese flap!</p>
+            <p>Avoid the pipes and get the highest score!</p>
+            <button onclick="startCountdown()">START GAME</button>
+        </div>
+
+        <div id="countdownScreen" style="display: none;">
+            <div id="countdownNumber">3</div>
+            <div id="startText">Get Ready!</div>
+        </div>
+
+        <div id="gameOverScreen" style="display: none;">
+            <h1>GAME OVER!</h1>
+            <p id="finalScore">Score: 0</p>
+            <button id="restartBtn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('gameContainer');
+        const cheese = document.getElementById('cheese');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const countdownScreen = document.getElementById('countdownScreen');
+        const instructionsScreen = document.getElementById('instructionsScreen');
+        const countdownNumber = document.getElementById('countdownNumber');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+
+        let cheeseY = 250;
+        let cheeseVelocity = 0;
+        const gravity = 0.6;
+        const jumpPower = -12;
+        let score = 0;
+        let gameRunning = false;
+        let gameOver = false;
+        let pipes = [];
+        const pipeGap = 120;
+        const pipeWidth = 60;
+        const pipeSpeed = 5;
+        const containerWidth = 400;
+        const containerHeight = 600;
+
+        function startCountdown() {
+            instructionsScreen.style.display = 'none';
+            countdownScreen.style.display = 'flex';
+            let count = 3;
+            
+            const countInterval = setInterval(() => {
+                if (count > 0) {
+                    countdownNumber.textContent = count;
+                    count--;
+                } else {
+                    clearInterval(countInterval);
+                    countdownScreen.style.display = 'none';
+                    gameRunning = true;
+                    gameLoop();
+                }
+            }, 1000);
+        }
+
+        function createPipe() {
+            const gapStart = Math.random() * (containerHeight - pipeGap - 100) + 50;
+            const pipe = {
+                x: containerWidth,
+                gapStart: gapStart,
+                gapEnd: gapStart + pipeGap,
+                scored: false
+            };
+            pipes.push(pipe);
+        }
+
+        function gameLoop() {
+            if (!gameRunning || gameOver) return;
+
+            // Apply gravity
+            cheeseVelocity += gravity;
+            cheeseY += cheeseVelocity;
+
+            // Update cheese position
+            cheese.style.top = cheeseY + 'px';
+
+            // Create pipes
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < containerWidth - 150) {
+                createPipe();
+            }
+
+            // Move pipes
+            pipes = pipes.filter(pipe => {
+                pipe.x -= pipeSpeed;
+                
+                // Draw pipe
+                drawPipe(pipe);
+
+                // Score detection
+                if (pipe.x < 50 && !pipe.scored) {
+                    score++;
+                    scoreDisplay.textContent = `Score: ${score}`;
+                    pipe.scored = true;
+                }
+
+                // Collision detection
+                if (collisionDetection(pipe)) {
+                    endGame();
+                }
+
+                return pipe.x > -pipeWidth;
+            });
+
+            // Boundary detection
+            if (cheeseY < 0 || cheeseY > containerHeight - 40) {
+                endGame();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawPipe(pipe) {
+            // Remove old pipes from DOM
+            const oldPipes = document.querySelectorAll('.pipe');
+            oldPipes.forEach(p => p.remove());
+
+            // Draw all pipes
+            pipes.forEach(p => {
+                const topPipe = document.createElement('div');
+                topPipe.className = 'pipe pipe-top';
+                topPipe.style.left = p.x + 'px';
+                topPipe.style.height = p.gapStart + 'px';
+                gameContainer.appendChild(topPipe);
+
+                const bottomPipe = document.createElement('div');
+                bottomPipe.className = 'pipe pipe-bottom';
+                bottomPipe.style.left = p.x + 'px';
+                bottomPipe.style.height = (containerHeight - p.gapEnd) + 'px';
+                gameContainer.appendChild(bottomPipe);
+            });
+        }
+
+        function collisionDetection(pipe) {
+            const cheeseX = 50;
+            const cheeseWidth = 40;
+            const cheeseHeight = 40;
+
+            if (cheeseX + cheeseWidth > pipe.x && cheeseX < pipe.x + pipeWidth) {
+                if (cheeseY < pipe.gapStart || cheeseY + cheeseHeight > pipe.gapEnd) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function endGame() {
+            gameRunning = false;
+            gameOver = true;
+            finalScoreDisplay.textContent = `Score: ${score}`;
+            gameOverScreen.style.display = 'flex';
+        }
+
+        function resetGame() {
+            cheeseY = 250;
+            cheeseVelocity = 0;
+            score = 0;
+            scoreDisplay.textContent = `Score: 0`;
+            gameOver = false;
+            pipes = [];
+            cheese.style.top = cheeseY + 'px';
+            gameOverScreen.style.display = 'none';
+            startCountdown();
+        }
+
+        // Controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && gameRunning) {
+                e.preventDefault();
+                cheeseVelocity = jumpPower;
+            }
+        });
+
+        gameContainer.addEventListener('click', () => {
+            if (gameRunning) {
+                cheeseVelocity = jumpPower;
+            }
+        });
+
+        restartBtn.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
