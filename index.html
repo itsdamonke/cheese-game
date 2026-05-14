@@ -106,10 +106,27 @@
             cursor: pointer;
             font-weight: bold;
             transition: background 0.3s;
+            margin-bottom: 10px;
         }
 
         #restartBtn:hover {
             background: #FFC700;
+        }
+
+        #backMenuBtn {
+            padding: 10px 25px;
+            font-size: 16px;
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        #backMenuBtn:hover {
+            background: #888;
         }
 
         #countdownScreen {
@@ -190,32 +207,119 @@
             margin-bottom: 10px;
         }
 
-        #instructionsScreen button {
-            margin-top: 30px;
-            padding: 12px 25px;
+        #modeSelectScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 25;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #modeSelectScreen h1 {
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: #FFD700;
+        }
+
+        .modeButton {
+            width: 280px;
+            padding: 15px;
             font-size: 18px;
-            background: #FFD700;
+            margin-bottom: 12px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.3s;
         }
 
-        #instructionsScreen button:hover {
-            background: #FFC700;
+        .modeButton:hover {
+            transform: scale(1.05);
+        }
+
+        #noobBtn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        #noobBtn:hover {
+            background: #45a049;
+        }
+
+        #easyBtn {
+            background: #2196F3;
+            color: white;
+        }
+
+        #easyBtn:hover {
+            background: #0b7dda;
+        }
+
+        #normalBtn {
+            background: #FF9800;
+            color: white;
+        }
+
+        #normalBtn:hover {
+            background: #e68900;
+        }
+
+        #hardBtn {
+            background: #f44336;
+            color: white;
+        }
+
+        #hardBtn:hover {
+            background: #da190b;
+        }
+
+        #superBtn {
+            background: linear-gradient(45deg, #FF1493, #FFD700);
+            color: white;
+            font-size: 16px;
+        }
+
+        #superBtn:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        #currentMode {
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            font-size: 16px;
+            color: #FFD700;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <div id="score">Score: 0</div>
+        <div id="currentMode">Mode: -</div>
         <div id="cheese">🧀</div>
         
-        <div id="instructionsScreen">
+        <div id="modeSelectScreen">
             <h1>🧀 FLAPPY CHEESE 🧀</h1>
-            <p>Click or press SPACE to make the cheese flap!</p>
-            <p>Avoid the pipes and get the highest score!</p>
-            <button onclick="startCountdown()">START GAME</button>
+            <p style="margin-bottom: 25px; font-size: 14px;">Select Game Mode:</p>
+            <button class="modeButton" id="noobBtn" onclick="selectMode('noob')">🟢 NOOB (Super Easy)</button>
+            <button class="modeButton" id="easyBtn" onclick="selectMode('easy')">🔵 EASY</button>
+            <button class="modeButton" id="normalBtn" onclick="selectMode('normal')">🟠 NORMAL</button>
+            <button class="modeButton" id="hardBtn" onclick="selectMode('hard')">🔴 HARD</button>
+            <button class="modeButton" id="superBtn" onclick="selectMode('superhardXtremedeluxe2000')">⚡ SUPERHARD XTREME DELUXE 2000</button>
         </div>
 
         <div id="countdownScreen" style="display: none;">
@@ -227,6 +331,7 @@
             <h1>GAME OVER!</h1>
             <p id="finalScore">Score: 0</p>
             <button id="restartBtn">Play Again</button>
+            <button id="backMenuBtn">Back to Menu</button>
         </div>
     </div>
 
@@ -234,29 +339,76 @@
         const gameContainer = document.getElementById('gameContainer');
         const cheese = document.getElementById('cheese');
         const scoreDisplay = document.getElementById('score');
+        const currentModeDisplay = document.getElementById('currentMode');
         const gameOverScreen = document.getElementById('gameOverScreen');
         const countdownScreen = document.getElementById('countdownScreen');
-        const instructionsScreen = document.getElementById('instructionsScreen');
+        const modeSelectScreen = document.getElementById('modeSelectScreen');
         const countdownNumber = document.getElementById('countdownNumber');
         const finalScoreDisplay = document.getElementById('finalScore');
         const restartBtn = document.getElementById('restartBtn');
+        const backMenuBtn = document.getElementById('backMenuBtn');
 
         let cheeseY = 250;
         let cheeseVelocity = 0;
-        const gravity = 0.6;
-        const jumpPower = -12;
         let score = 0;
         let gameRunning = false;
         let gameOver = false;
         let pipes = [];
-        const pipeGap = 120;
-        const pipeWidth = 60;
-        const pipeSpeed = 5;
         const containerWidth = 400;
         const containerHeight = 600;
+        let currentMode = '';
+        let modeSettings = {
+            noob: {
+                gravity: 0.3,
+                jumpPower: -10,
+                pipeGap: 200,
+                pipeSpeed: 2,
+                spawnDistance: 250,
+                label: "NOOB"
+            },
+            easy: {
+                gravity: 0.45,
+                jumpPower: -11,
+                pipeGap: 160,
+                pipeSpeed: 3,
+                spawnDistance: 200,
+                label: "EASY"
+            },
+            normal: {
+                gravity: 0.6,
+                jumpPower: -12,
+                pipeGap: 120,
+                pipeSpeed: 5,
+                spawnDistance: 150,
+                label: "NORMAL"
+            },
+            hard: {
+                gravity: 0.75,
+                jumpPower: -13,
+                pipeGap: 100,
+                pipeSpeed: 6.5,
+                spawnDistance: 130,
+                label: "HARD"
+            },
+            superhardXtremedeluxe2000: {
+                gravity: 1.0,
+                jumpPower: -14,
+                pipeGap: 80,
+                pipeSpeed: 8,
+                spawnDistance: 110,
+                label: "XTREME 2000"
+            }
+        };
+
+        function selectMode(mode) {
+            currentMode = mode;
+            const settings = modeSettings[mode];
+            currentModeDisplay.textContent = `Mode: ${settings.label}`;
+            modeSelectScreen.style.display = 'none';
+            startCountdown();
+        }
 
         function startCountdown() {
-            instructionsScreen.style.display = 'none';
             countdownScreen.style.display = 'flex';
             let count = 3;
             
@@ -274,11 +426,12 @@
         }
 
         function createPipe() {
-            const gapStart = Math.random() * (containerHeight - pipeGap - 100) + 50;
+            const settings = modeSettings[currentMode];
+            const gapStart = Math.random() * (containerHeight - settings.pipeGap - 100) + 50;
             const pipe = {
                 x: containerWidth,
                 gapStart: gapStart,
-                gapEnd: gapStart + pipeGap,
+                gapEnd: gapStart + settings.pipeGap,
                 scored: false
             };
             pipes.push(pipe);
@@ -287,21 +440,24 @@
         function gameLoop() {
             if (!gameRunning || gameOver) return;
 
+            const settings = modeSettings[currentMode];
+            const pipeWidth = 60;
+
             // Apply gravity
-            cheeseVelocity += gravity;
+            cheeseVelocity += settings.gravity;
             cheeseY += cheeseVelocity;
 
             // Update cheese position
             cheese.style.top = cheeseY + 'px';
 
             // Create pipes
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < containerWidth - 150) {
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < containerWidth - settings.spawnDistance) {
                 createPipe();
             }
 
             // Move pipes
             pipes = pipes.filter(pipe => {
-                pipe.x -= pipeSpeed;
+                pipe.x -= settings.pipeSpeed;
                 
                 // Draw pipe
                 drawPipe(pipe);
@@ -314,7 +470,7 @@
                 }
 
                 // Collision detection
-                if (collisionDetection(pipe)) {
+                if (collisionDetection(pipe, settings.pipeGap)) {
                     endGame();
                 }
 
@@ -330,6 +486,9 @@
         }
 
         function drawPipe(pipe) {
+            const settings = modeSettings[currentMode];
+            const pipeWidth = 60;
+
             // Remove old pipes from DOM
             const oldPipes = document.querySelectorAll('.pipe');
             oldPipes.forEach(p => p.remove());
@@ -350,10 +509,11 @@
             });
         }
 
-        function collisionDetection(pipe) {
+        function collisionDetection(pipe, pipeGap) {
             const cheeseX = 50;
             const cheeseWidth = 40;
             const cheeseHeight = 40;
+            const pipeWidth = 60;
 
             if (cheeseX + cheeseWidth > pipe.x && cheeseX < pipe.x + pipeWidth) {
                 if (cheeseY < pipe.gapStart || cheeseY + cheeseHeight > pipe.gapEnd) {
@@ -382,21 +542,42 @@
             startCountdown();
         }
 
+        function backToMenu() {
+            cheeseY = 250;
+            cheeseVelocity = 0;
+            score = 0;
+            scoreDisplay.textContent = `Score: 0`;
+            gameRunning = false;
+            gameOver = false;
+            pipes = [];
+            cheese.style.top = cheeseY + 'px';
+            gameOverScreen.style.display = 'none';
+            modeSelectScreen.style.display = 'flex';
+            currentModeDisplay.textContent = `Mode: -`;
+
+            // Remove pipes from DOM
+            const allPipes = document.querySelectorAll('.pipe');
+            allPipes.forEach(p => p.remove());
+        }
+
         // Controls
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && gameRunning) {
                 e.preventDefault();
-                cheeseVelocity = jumpPower;
+                const settings = modeSettings[currentMode];
+                cheeseVelocity = settings.jumpPower;
             }
         });
 
         gameContainer.addEventListener('click', () => {
             if (gameRunning) {
-                cheeseVelocity = jumpPower;
+                const settings = modeSettings[currentMode];
+                cheeseVelocity = settings.jumpPower;
             }
         });
 
         restartBtn.addEventListener('click', resetGame);
+        backMenuBtn.addEventListener('click', backToMenu);
     </script>
 </body>
 </html>
