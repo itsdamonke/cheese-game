@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Cheese 🧀 - Pro Edition</title>
+    <title>Flappy Cheese 🧀</title>
     <style>
         * {
             margin: 0;
@@ -12,80 +12,45 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+            padding: 10px;
         }
 
         #gameContainer {
             position: relative;
-            width: 600px;
-            height: 800px;
-            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #FFD700 100%);
-            border: 8px solid #333;
-            border-radius: 20px;
+            width: 500px;
+            height: 700px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+            border: 5px solid #333;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(255, 255, 255, 0.3);
-        }
-
-        #gameContainer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 1;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
 
         #cheese {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            font-size: 60px;
-            line-height: 60px;
-            left: 70px;
-            top: 350px;
+            width: 50px;
+            height: 50px;
+            font-size: 50px;
+            line-height: 50px;
+            left: 60px;
+            top: 300px;
             user-select: none;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
             z-index: 5;
-            transition: transform 0.05s;
-        }
-
-        #cheese:hover {
-            transform: scale(1.1) rotate(5deg);
         }
 
         .pipe {
             position: absolute;
-            width: 80px;
-            background: linear-gradient(90deg, #8B7355 0%, #A0826D 25%, #D2B48C 50%, #A0826D 75%, #8B7355 100%);
-            border: 4px solid #654321;
-            border-radius: 10px;
-            box-shadow: inset -3px 0 8px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .pipe::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 10px,
-                rgba(0, 0, 0, 0.1) 10px,
-                rgba(0, 0, 0, 0.1) 12px
-            );
-            border-radius: 6px;
+            width: 70px;
+            background: linear-gradient(90deg, #8B7355 0%, #D2B48C 50%, #8B7355 100%);
+            border: 3px solid #654321;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .pipe-top {
@@ -98,30 +63,27 @@
 
         #score {
             position: absolute;
-            top: 30px;
-            left: 30px;
-            font-size: 32px;
+            top: 20px;
+            left: 20px;
+            font-size: 28px;
             font-weight: bold;
             color: #333;
-            z-index: 15;
+            z-index: 10;
             background: rgba(255, 255, 255, 0.8);
-            padding: 12px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            font-family: 'Arial Black', sans-serif;
+            padding: 10px 16px;
+            border-radius: 8px;
         }
 
         #bestScore {
             position: absolute;
-            top: 30px;
-            right: 30px;
-            font-size: 18px;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
             color: #333;
-            z-index: 15;
+            z-index: 10;
             background: rgba(255, 255, 255, 0.8);
-            padding: 10px 16px;
+            padding: 8px 12px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         #gameOverScreen {
@@ -130,76 +92,55 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(30, 30, 60, 0.9) 100%);
-            display: flex;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 20;
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
         }
 
         #gameOverScreen h1 {
             color: #FFD700;
-            font-size: 64px;
-            margin-bottom: 30px;
-            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 215, 0, 0.5);
-            animation: bounce 0.6s ease-in-out;
+            font-size: 50px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .scoreDisplay {
+        #gameOverScreen p {
             color: white;
-            font-size: 28px;
-            margin-bottom: 12px;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 15px 25px;
-            border-radius: 8px;
-            border-left: 4px solid #FFD700;
+            font-size: 20px;
+            margin-bottom: 20px;
         }
 
         #restartBtn {
-            padding: 18px 45px;
-            font-size: 24px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
+            padding: 12px 30px;
+            font-size: 18px;
+            background: #FFD700;
             border: none;
-            border-radius: 12px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
         }
 
         #restartBtn:hover {
-            background: linear-gradient(135deg, #FFC700 0%, #FFB700 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.6);
+            background: #FFC700;
         }
 
         #backMenuBtn {
-            padding: 12px 35px;
-            font-size: 18px;
-            background: linear-gradient(135deg, #666 0%, #888 100%);
+            padding: 10px 25px;
+            font-size: 16px;
+            background: #666;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         #backMenuBtn:hover {
-            background: linear-gradient(135deg, #888 0%, #AAA 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            background: #888;
         }
 
         #countdownScreen {
@@ -208,52 +149,25 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(50, 50, 100, 0.8) 100%);
-            display: flex;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 30;
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
         }
 
         #countdownNumber {
             color: #FFD700;
-            font-size: 180px;
+            font-size: 100px;
             font-weight: bold;
-            text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.6);
-            animation: countPulse 0.8s ease-in-out;
-            font-family: 'Arial Black', sans-serif;
-        }
-
-        @keyframes countPulse {
-            0% {
-                transform: scale(0.3) rotateZ(-10deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.3) rotateZ(5deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1) rotateZ(0deg);
-                opacity: 1;
-            }
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
         }
 
         #startText {
-            color: #FFD700;
-            font-size: 36px;
-            margin-top: 40px;
-            animation: textBlink 1s infinite;
-            font-weight: bold;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-        }
-
-        @keyframes textBlink {
-            0%, 50% { opacity: 1; transform: scale(1); }
-            51%, 100% { opacity: 0.3; transform: scale(0.95); }
+            color: white;
+            font-size: 24px;
+            margin-top: 20px;
         }
 
         #modeSelectScreen {
@@ -262,7 +176,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(20, 20, 40, 0.95) 0%, rgba(40, 30, 60, 0.95) 100%);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -270,152 +184,90 @@
             z-index: 25;
             color: white;
             text-align: center;
-            padding: 40px 20px;
-            overflow-y: auto;
-            backdrop-filter: blur(5px);
+            padding: 30px;
         }
 
         #modeSelectScreen h1 {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 40px;
+            margin-bottom: 25px;
             color: #FFD700;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
         }
 
         #modeSelectScreen p {
-            font-size: 18px;
-            margin-bottom: 40px;
+            font-size: 16px;
+            margin-bottom: 30px;
             color: #DDD;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
         }
 
         .modeButton {
-            width: 320px;
-            padding: 20px;
-            font-size: 20px;
-            margin-bottom: 15px;
+            width: 280px;
+            padding: 14px;
+            font-size: 16px;
+            margin-bottom: 12px;
             border: none;
-            border-radius: 12px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .modeButton::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-            z-index: -1;
-        }
-
-        .modeButton:hover::before {
-            width: 400px;
-            height: 400px;
+            color: white;
         }
 
         .modeButton:hover {
-            transform: translateY(-5px) scale(1.05);
+            transform: scale(1.05);
         }
 
         #noobBtn {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            color: white;
+            background: #4CAF50;
         }
 
         #noobBtn:hover {
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6);
+            background: #45a049;
         }
 
         #easyBtn {
-            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-            color: white;
+            background: #2196F3;
         }
 
         #easyBtn:hover {
-            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.6);
+            background: #0b7dda;
         }
 
         #normalBtn {
-            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-            color: white;
+            background: #FF9800;
         }
 
         #normalBtn:hover {
-            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.6);
+            background: #e68900;
         }
 
         #hardBtn {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            color: white;
+            background: #f44336;
         }
 
         #hardBtn:hover {
-            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.6);
+            background: #da190b;
         }
 
         #superBtn {
-            background: linear-gradient(135deg, #FF1493 0%, #FFD700 50%, #FF1493 100%);
-            background-size: 200% 200%;
-            color: white;
-            font-size: 18px;
-            animation: gradientShift 3s ease infinite;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            background: linear-gradient(45deg, #FF1493, #FFD700);
+            font-size: 15px;
         }
 
         #superBtn:hover {
-            box-shadow: 0 8px 30px rgba(255, 20, 147, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
-            animation: superPulse 0.6s ease-in-out infinite;
-        }
-
-        @keyframes superPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            transform: scale(1.05) rotate(2deg);
         }
 
         #currentMode {
             position: absolute;
-            top: 30px;
+            top: 70px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 18px;
+            font-size: 14px;
             color: #FFD700;
-            z-index: 15;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(30, 30, 60, 0.8) 100%);
-            padding: 12px 24px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-            border: 2px solid #FFD700;
-            font-weight: bold;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
-        }
-
-        @media (max-width: 700px) {
-            #gameContainer {
-                width: 95vw;
-                height: 130vw;
-                max-width: 500px;
-                max-height: 650px;
-            }
-            
-            .modeButton {
-                width: 90%;
-            }
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 6px 14px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -427,26 +279,26 @@
         <div id="cheese">🧀</div>
         
         <div id="modeSelectScreen">
-            <h1>🧀 FLAPPY CHEESE 🧀</h1>
-            <p>Select Your Challenge:</p>
-            <button class="modeButton" id="noobBtn">🟢 NOOB (Super Easy)</button>
-            <button class="modeButton" id="easyBtn">🔵 EASY</button>
-            <button class="modeButton" id="normalBtn">🟠 NORMAL</button>
-            <button class="modeButton" id="hardBtn">🔴 HARD</button>
-            <button class="modeButton" id="superBtn">⚡ SUPERHARD XTREME DELUXE 2000 ⚡</button>
+            <h1>FLAPPY CHEESE</h1>
+            <p>Select Difficulty:</p>
+            <button class="modeButton" id="noobBtn">NOOB</button>
+            <button class="modeButton" id="easyBtn">EASY</button>
+            <button class="modeButton" id="normalBtn">NORMAL</button>
+            <button class="modeButton" id="hardBtn">HARD</button>
+            <button class="modeButton" id="superBtn">XTREME</button>
         </div>
 
-        <div id="countdownScreen" style="display: none;">
+        <div id="countdownScreen">
             <div id="countdownNumber">3</div>
             <div id="startText">Get Ready!</div>
         </div>
 
-        <div id="gameOverScreen" style="display: none;">
+        <div id="gameOverScreen">
             <h1>GAME OVER!</h1>
-            <div class="scoreDisplay">Current Score: <span id="finalScore">0</span></div>
-            <div class="scoreDisplay">Best Score: <span id="bestScoreDisplay">0</span></div>
+            <p id="finalScore">Score: 0</p>
+            <p id="bestScoreDisplay">Best: 0</p>
             <button id="restartBtn">Play Again</button>
-            <button id="backMenuBtn">Change Mode</button>
+            <button id="backMenuBtn">Back to Menu</button>
         </div>
     </div>
 
@@ -465,77 +317,44 @@
         const restartBtn = document.getElementById('restartBtn');
         const backMenuBtn = document.getElementById('backMenuBtn');
 
-        let cheeseY = 350;
+        let cheeseY = 300;
         let cheeseVelocity = 0;
         let score = 0;
-        let bestScore = localStorage.getItem('cheeseGameBestScore') ? parseInt(localStorage.getItem('cheeseGameBestScore')) : 0;
+        let bestScore = localStorage.getItem('cheeseBest') ? parseInt(localStorage.getItem('cheeseBest')) : 0;
         let gameRunning = false;
         let gameOver = false;
         let pipes = [];
-        const containerWidth = 600;
-        const containerHeight = 800;
+        const containerWidth = 500;
+        const containerHeight = 700;
         let currentMode = '';
+        
         let modeSettings = {
-            noob: {
-                gravity: 0.25,
-                jumpPower: -9,
-                pipeGap: 250,
-                pipeSpeed: 2.5,
-                spawnDistance: 300,
-                label: "NOOB"
-            },
-            easy: {
-                gravity: 0.4,
-                jumpPower: -10,
-                pipeGap: 200,
-                pipeSpeed: 3.5,
-                spawnDistance: 250,
-                label: "EASY"
-            },
-            normal: {
-                gravity: 0.6,
-                jumpPower: -12,
-                pipeGap: 150,
-                pipeSpeed: 5,
-                spawnDistance: 200,
-                label: "NORMAL"
-            },
-            hard: {
-                gravity: 0.8,
-                jumpPower: -13,
-                pipeGap: 120,
-                pipeSpeed: 6.5,
-                spawnDistance: 170,
-                label: "HARD"
-            },
-            superhardXtremedeluxe2000: {
-                gravity: 1.1,
-                jumpPower: -14,
-                pipeGap: 90,
-                pipeSpeed: 8.5,
-                spawnDistance: 140,
-                label: "XTREME 2000"
-            }
+            noob: { gravity: 0.3, jumpPower: -10, pipeGap: 180, pipeSpeed: 2, label: "NOOB" },
+            easy: { gravity: 0.45, jumpPower: -11, pipeGap: 140, pipeSpeed: 3, label: "EASY" },
+            normal: { gravity: 0.6, jumpPower: -12, pipeGap: 110, pipeSpeed: 5, label: "NORMAL" },
+            hard: { gravity: 0.75, jumpPower: -13, pipeGap: 90, pipeSpeed: 6.5, label: "HARD" },
+            superhardXtremedeluxe2000: { gravity: 1.0, jumpPower: -14, pipeGap: 70, pipeSpeed: 8, label: "XTREME" }
         };
 
-        bestScoreDisplay.textContent = bestScore;
+        bestScoreDisplay.textContent = 'Best: ' + bestScore;
 
         function selectMode(mode) {
             currentMode = mode;
             const settings = modeSettings[mode];
-            currentModeDisplay.textContent = `Mode: ${settings.label}`;
+            currentModeDisplay.textContent = 'Mode: ' + settings.label;
             modeSelectScreen.style.display = 'none';
+            countdownScreen.style.display = 'flex';
             startCountdown();
         }
 
         function startCountdown() {
-            countdownScreen.style.display = 'flex';
             let count = 3;
+            countdownNumber.textContent = count;
             
             const countInterval = setInterval(() => {
+                count--;
                 if (count > 0) {
                     countdownNumber.textContent = count;
-                    count--;
                 } else {
                     clearInterval(countInterval);
                     countdownScreen.style.display = 'none';
@@ -547,156 +366,119 @@
 
         function createPipe() {
             const settings = modeSettings[currentMode];
-            const minGapStart = 80;
-            const maxGapStart = containerHeight - settings.pipeGap - 80;
-            const gapStart = Math.random() * (maxGapStart - minGapStart) + minGapStart;
-            const pipe = {
+            const gapStart = Math.random() * (containerHeight - settings.pipeGap - 100) + 50;
+            pipes.push({
                 x: containerWidth,
                 gapStart: gapStart,
                 gapEnd: gapStart + settings.pipeGap,
                 scored: false
-            };
-            pipes.push(pipe);
+            });
         }
 
         function gameLoop() {
             if (!gameRunning || gameOver) return;
 
             const settings = modeSettings[currentMode];
-            const pipeWidth = 80;
 
-            // Apply gravity
             cheeseVelocity += settings.gravity;
             cheeseY += cheeseVelocity;
-
-            // Update cheese position
             cheese.style.top = cheeseY + 'px';
 
-            // Create pipes
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < containerWidth - settings.spawnDistance) {
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < 150) {
                 createPipe();
             }
 
-            // Move pipes
             pipes = pipes.filter(pipe => {
                 pipe.x -= settings.pipeSpeed;
                 
-                // Draw pipe
-                drawPipe(pipe);
+                const topPipe = document.createElement('div');
+                topPipe.className = 'pipe pipe-top';
+                topPipe.style.left = pipe.x + 'px';
+                topPipe.style.height = pipe.gapStart + 'px';
+                gameContainer.appendChild(topPipe);
 
-                // Score detection
-                if (pipe.x < 70 && !pipe.scored) {
+                const bottomPipe = document.createElement('div');
+                bottomPipe.className = 'pipe pipe-bottom';
+                bottomPipe.style.left = pipe.x + 'px';
+                bottomPipe.style.height = (containerHeight - pipe.gapEnd) + 'px';
+                gameContainer.appendChild(bottomPipe);
+
+                if (pipe.x < 60 && !pipe.scored) {
                     score++;
-                    scoreDisplay.textContent = `Score: ${score}`;
+                    scoreDisplay.textContent = 'Score: ' + score;
                     pipe.scored = true;
                 }
 
-                // Collision detection
-                if (collisionDetection(pipe)) {
-                    endGame();
+                if (60 + 50 > pipe.x && 60 < pipe.x + 70) {
+                    if (cheeseY < pipe.gapStart || cheeseY + 50 > pipe.gapEnd) {
+                        endGame();
+                    }
                 }
 
-                return pipe.x > -pipeWidth;
+                return pipe.x > -70;
             });
 
-            // Boundary detection
-            if (cheeseY < 0 || cheeseY > containerHeight - 60) {
+            if (cheeseY < 0 || cheeseY > containerHeight - 50) {
                 endGame();
             }
 
             requestAnimationFrame(gameLoop);
         }
 
-        function drawPipe(pipe) {
-            const pipeWidth = 80;
-
-            // Remove old pipes from DOM
-            const oldPipes = document.querySelectorAll('.pipe');
-            oldPipes.forEach(p => p.remove());
-
-            // Draw all pipes
-            pipes.forEach(p => {
-                const topPipe = document.createElement('div');
-                topPipe.className = 'pipe pipe-top';
-                topPipe.style.left = p.x + 'px';
-                topPipe.style.height = p.gapStart + 'px';
-                gameContainer.appendChild(topPipe);
-
-                const bottomPipe = document.createElement('div');
-                bottomPipe.className = 'pipe pipe-bottom';
-                bottomPipe.style.left = p.x + 'px';
-                bottomPipe.style.height = (containerHeight - p.gapEnd) + 'px';
-                gameContainer.appendChild(bottomPipe);
-            });
-        }
-
-        function collisionDetection(pipe) {
-            const cheeseX = 70;
-            const cheeseWidth = 60;
-            const cheeseHeight = 60;
-            const pipeWidth = 80;
-
-            if (cheeseX + cheeseWidth > pipe.x && cheeseX < pipe.x + pipeWidth) {
-                if (cheeseY < pipe.gapStart || cheeseY + cheeseHeight > pipe.gapEnd) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         function endGame() {
             gameRunning = false;
             gameOver = true;
-            finalScoreDisplay.textContent = score;
+            finalScoreDisplay.textContent = 'Score: ' + score;
             
             if (score > bestScore) {
                 bestScore = score;
-                localStorage.setItem('cheeseGameBestScore', bestScore);
-                bestScoreDisplay.textContent = bestScore;
+                localStorage.setItem('cheeseBest', bestScore);
+                bestScoreDisplay.textContent = 'Best: ' + bestScore;
             }
-            
-            bestScoreEndDisplay.textContent = bestScore;
+            bestScoreEndDisplay.textContent = 'Best: ' + bestScore;
             gameOverScreen.style.display = 'flex';
         }
 
         function resetGame() {
-            cheeseY = 350;
+            cheeseY = 300;
             cheeseVelocity = 0;
             score = 0;
-            scoreDisplay.textContent = `Score: 0`;
+            scoreDisplay.textContent = 'Score: 0';
             gameOver = false;
             pipes = [];
             cheese.style.top = cheeseY + 'px';
             gameOverScreen.style.display = 'none';
+            
+            const allPipes = document.querySelectorAll('.pipe');
+            allPipes.forEach(p => p.remove());
+            
+            countdownScreen.style.display = 'flex';
             startCountdown();
         }
 
         function backToMenu() {
-            cheeseY = 350;
+            cheeseY = 300;
             cheeseVelocity = 0;
             score = 0;
-            scoreDisplay.textContent = `Score: 0`;
+            scoreDisplay.textContent = 'Score: 0';
             gameRunning = false;
             gameOver = false;
             pipes = [];
             cheese.style.top = cheeseY + 'px';
             gameOverScreen.style.display = 'none';
             modeSelectScreen.style.display = 'flex';
-            currentModeDisplay.textContent = `Mode: -`;
+            currentModeDisplay.textContent = 'Mode: -';
 
-            // Remove pipes from DOM
             const allPipes = document.querySelectorAll('.pipe');
             allPipes.forEach(p => p.remove());
         }
 
-        // Button event listeners
         document.getElementById('noobBtn').addEventListener('click', () => selectMode('noob'));
         document.getElementById('easyBtn').addEventListener('click', () => selectMode('easy'));
         document.getElementById('normalBtn').addEventListener('click', () => selectMode('normal'));
         document.getElementById('hardBtn').addEventListener('click', () => selectMode('hard'));
         document.getElementById('superBtn').addEventListener('click', () => selectMode('superhardXtremedeluxe2000'));
 
-        // Game controls
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && gameRunning) {
                 e.preventDefault();
